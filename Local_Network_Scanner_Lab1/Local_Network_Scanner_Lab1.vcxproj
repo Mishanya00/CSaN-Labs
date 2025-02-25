@@ -129,11 +129,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BasicSocketClient.cpp" />
+    <ClCompile Include="basic_socket_client.cpp" />
+    <ClCompile Include="icmp_client.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BasicSocketClient.hpp" />
+    <ClInclude Include="basic_socket_client.hpp" />
+    <ClInclude Include="icmp_client.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
