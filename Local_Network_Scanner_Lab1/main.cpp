@@ -4,6 +4,9 @@
 
 #include <iostream>
 #include <string>
+#include <thread>
+#include <chrono>
+
 #include "basic_socket_client.hpp"
 #include "icmp_client.hpp"
 
@@ -34,14 +37,30 @@ int BasicSocketClientTest()
     return 0;
 }
 
-int main()
-{
+void Ping(const std::string& targetIp) {
     try {
         IcmpClient icmpClient;
-        icmpClient.SendPing("192.168.1.4"); // Send ICMP ping to 192.168.1.4
+        icmpClient.SendPing(targetIp);
     }
     catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << "Error in thread: " << e.what() << std::endl;
+    }
+}
+
+// 192.168.1.x
+
+int main()
+{
+    std::vector<std::thread> threads;
+    std::string ip_addr;
+
+    for (int i = 0; i <= 255; ++i) {
+        ip_addr = "192.168.1." + std::to_string(i);
+        threads.emplace_back(Ping, ip_addr);
+    }
+
+    for (auto& t : threads) {
+        t.join();
     }
 
     return 0;

@@ -68,3 +68,22 @@ void IcmpClient::SendPing(const std::string& targetIp) {
         std::cerr << "Unexpected ICMP reply\n";
     }
 }
+
+uint16_t IcmpClient::CalculateChecksum(const void* data, size_t length)
+{
+    const uint16_t* ptr = (const uint16_t*)data;
+    uint32_t sum = 0;
+
+    while (length > 1) {
+        sum += *ptr++;
+        length -= 2;
+    }
+
+    if (length == 1) {
+        sum += *(const uint8_t*)ptr;
+    }
+
+    sum = (sum >> 16) + (sum & 0xFFFF);
+    sum += (sum >> 16);
+    return (uint16_t)(~sum);
+}
