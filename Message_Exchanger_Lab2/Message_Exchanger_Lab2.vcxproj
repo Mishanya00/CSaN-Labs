@@ -104,6 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,11 +128,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="basic_socket_client.cpp" />
+    <ClCompile Include="mishanya_utils.cpp" />
+    <ClCompile Include="safe_cmd.cpp" />
+    <ClCompile Include="socket_server.cpp" />
+    <ClCompile Include="socket_client.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="basic_socket_client.hpp" />
+    <ClInclude Include="mishanya_utils.hpp" />
+    <ClInclude Include="safe_cmd.hpp" />
+    <ClInclude Include="socket_client.hpp" />
+    <ClInclude Include="socket_server.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

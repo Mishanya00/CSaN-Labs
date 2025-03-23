@@ -1,20 +1,53 @@
-#include "basic_socket_client.hpp"
+#include "socket_client.hpp"
 
 #include <stdexcept>
 #include <ws2tcpip.h>
+#include "safe_cmd.hpp"
 
-BasicSocketClient::BasicSocketClient() : ConnectSocket_(INVALID_SOCKET) {
-    iResult_ = WSAStartup(MAKEWORD(2, 2), &wsaData_);
-    if (iResult_ != 0) {
-        throw std::runtime_error("WSAStartup failed: " + std::to_string(iResult_));
-    }
-}
+BasicSocketClient::BasicSocketClient(std::string server_ip, std::string server_port) : stop_(false), ConnectSocket_(INVALID_SOCKET),
+                                     server_ip_(server_ip), server_port_(server_port) { }
 
 BasicSocketClient::~BasicSocketClient() {
     if (ConnectSocket_ != INVALID_SOCKET) {
         closesocket(ConnectSocket_);
     }
-    WSACleanup();
+}
+
+void BasicSocketClient::Run()
+{
+    std::string serverAddress = "127.0.0.1";
+    std::string port = "12345";
+
+    std::string message;
+
+    while (!stop_)
+    {
+        this->Connect(serverAddress, port);
+
+        SafePrint("Your message: ");
+        message = SafeInput();
+
+        this->SendData(server_ip_ + " " + server_port_ + " " + message);
+        SafePrint("Sent: " + message + '\n');
+
+        std::string response = this->ReceiveData();
+        SafePrint("Received: " + response + '\n');
+
+        this->ShutdownConnection();
+    }
+}
+
+void BasicSocketClient::Start()
+{
+    client_thread_ = std::thread(&BasicSocketClient::Run, this);
+}
+
+void BasicSocketClient::Stop()
+{
+    stop_ = true;
+    if (client_thread_.joinable()) {
+        client_thread_.join();
+    }
 }
 
 void BasicSocketClient::Connect(std::string& serverName, std::string& port) {
