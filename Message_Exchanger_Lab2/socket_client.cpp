@@ -3,9 +3,12 @@
 #include <stdexcept>
 #include <ws2tcpip.h>
 #include "safe_cmd.hpp"
+#include <iostream>
 
-BasicSocketClient::BasicSocketClient(std::string server_ip, std::string server_port) : stop_(false), ConnectSocket_(INVALID_SOCKET),
-                                     server_ip_(server_ip), server_port_(server_port) { }
+BasicSocketClient::BasicSocketClient(std::string server_ip, std::string server_port, std::unordered_map<std::string, std::string> ipSubnetMap) : 
+                    stop_(false), ConnectSocket_(INVALID_SOCKET), server_ip_(server_ip), server_port_(server_port),
+                    ip_subnet_map_(ipSubnetMap)
+{ }
 
 BasicSocketClient::~BasicSocketClient() {
     if (ConnectSocket_ != INVALID_SOCKET) {
@@ -15,25 +18,55 @@ BasicSocketClient::~BasicSocketClient() {
 
 void BasicSocketClient::Run()
 {
-    std::string serverAddress = "127.0.0.1";
-    std::string port = "12345";
+    std::string receiver_ip; // = server_ip_; //"127.0.0.1";
+    std::string port; //="12345";
+    std::string menu;
+    bool isSelect = true;
 
     std::string message;
 
     while (!stop_)
     {
-        this->Connect(serverAddress, port);
+        if (isSelect) {
+           
+            /*
+            do {
+                SafePrint("IP to message: ");
+                receiver_ip = SafeInput();
+            } while (ip_subnet_map_.find(receiver_ip) == ip_subnet_map_.end());
+            */
 
-        SafePrint("Your message: ");
+            std::cout << "IP to message: ";
+            std::cin >> receiver_ip;
+
+            std::cout << "PORT to message: ";
+            std::cin >> port;
+            isSelect = false;
+        }
+        this->Connect(receiver_ip, port);
+
+        menu = "---------------------------------\nIP: " + receiver_ip + " port: " + port + '\n';
+        menu += "1. Send message\n2. Change receiver's IP & port\n";
+        menu += "---------------------------------\n";
+        SafePrint(menu);
+        
         message = SafeInput();
 
-        this->SendData(server_ip_ + " " + server_port_ + " " + message);
-        SafePrint("Sent: " + message + '\n');
+        if (message == "1") {
+            SafePrint("Your message: ");
+            message = SafeInput();
 
-        std::string response = this->ReceiveData();
-        SafePrint("Received: " + response + '\n');
+            this->SendData(server_ip_ + " " + server_port_ + " " + message);
+            SafePrint("Sent: " + message + '\n');
+        }
+        else if (message == "2") {
+            isSelect = true;
+        }
 
-        this->ShutdownConnection();
+        // std::string response = this->ReceiveData();
+        // SafePrint("Received: " + response + '\n');
+
+        this->ShutdownConnection(); 
     }
 }
 

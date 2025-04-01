@@ -3,10 +3,12 @@
 #include <thread>
 #include <atomic>
 
+#include <unordered_map>
+
 class BasicSocketClient {
 public:
 
-    BasicSocketClient(std::string server_ip, std::string server_port);
+    BasicSocketClient(std::string server_ip, std::string server_port, std::unordered_map<std::string, std::string> ipSubnetMap);
 
     ~BasicSocketClient();
 
@@ -38,4 +40,5 @@ private:
 
     std::string server_ip_;
     std::string server_port_;
+    std::unordered_map<std::string, std::string> ip_subnet_map_;
 };

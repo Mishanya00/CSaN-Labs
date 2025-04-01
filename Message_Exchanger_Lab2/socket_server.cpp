@@ -4,6 +4,9 @@
 
 #include <stdexcept>
 #include <ws2tcpip.h>
+#include <chrono>
+
+#include <iostream>
 
 #define DEFAULT_BUFLEN 512
 
@@ -80,7 +83,7 @@ void BasicSocketServer::Launch(const std::string& serverName, const std::string&
         throw std::runtime_error("Listen failed: " + std::to_string(WSAGetLastError()));
     }
 
-    SafePrint("Listening on " + serverName + ":" + port + "..." + '\n');
+    // SafePrint("Listening on " + serverName + ":" + port + "..." + '\n');
 
     while (!stop_) {
         ClientSocket_ = accept(ListenSocket_, NULL, NULL);
@@ -90,13 +93,15 @@ void BasicSocketServer::Launch(const std::string& serverName, const std::string&
             throw std::runtime_error("Accept failed: " + std::to_string(WSAGetLastError()));
         }
 
-        SafePrint("Client connected to server" + '\n');
+        // SafePrint("Client connected to server" + '\n');
 
         char recvbuf[DEFAULT_BUFLEN];
         int recvbuflen = DEFAULT_BUFLEN;
         iResult_ = recv(ClientSocket_, recvbuf, recvbuflen, 0);
         if (iResult_ > 0) {
-            SafePrint("Server received message: " + std::string(recvbuf, iResult_) + '\n');
+            //SafePrint("Server received message: " + std::string(recvbuf, iResult_) + '\n');
+
+            std::cout << "\nYou received message: " + std::string(recvbuf, iResult_) + '\n';
 
             iResult_ = send(ClientSocket_, recvbuf, iResult_, 0);
             if (iResult_ == SOCKET_ERROR) {
@@ -105,7 +110,7 @@ void BasicSocketServer::Launch(const std::string& serverName, const std::string&
             }
         }
         else if (iResult_ == 0) {
-            SafePrint("Connection closing..." + '\n');
+            // SafePrint("Connection closing..." + '\n');
         }
         else {
             closesocket(ClientSocket_);
@@ -113,6 +118,8 @@ void BasicSocketServer::Launch(const std::string& serverName, const std::string&
         }
 
         closesocket(ClientSocket_);
-        SafePrint("Connection closed." + '\n');
+        //SafePrint("Connection closed." + '\n');
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
